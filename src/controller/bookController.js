@@ -10,17 +10,12 @@ const createBooks=async function(req,res){
     
 try{
     let bookData=req.body;
-    
-    
-    //checks for valid userId format    
-    let checkObjectId = validator.isValidObjectId(bookData.userId)
-    if(!checkObjectId) return res.status(400).send({status:false, message: "Please enter a valid userId"})
-    if(bookData.userId !== req.headers["userid"]) return res.status(401).send({status: false, message: "Please create a book for the loggedIn user as you are not authorized"})
 
     // checking if we get any data from request body
     if(!(validator.isValid(bookData))) return res.status(400).send({status:false, message:"Please enter book details"})
 
     if(bookData.reviews)  return res.status(400).send({status:false, message:"Please don't provide reviews (count)"})
+    
     // validation which are must required
     let keys = Object.keys(bookData);
     let keys1 = ["title","excerpt","userId","ISBN","category","releasedAt"]
@@ -32,6 +27,12 @@ try{
     //alternate method for validation of must required-title,excerpt,etc.
     // if(!(validator.isValid(bookData.title))) return res.status(400).send({status: false, message: "Please provide proper title to create."})
     
+    //checks for valid userId format    
+    let checkObjectId = validator.isValidObjectId((bookData.userId).trim())
+    if(!checkObjectId) return res.status(400).send({status:false, message: "Please enter a valid userId"})
+    if((bookData.userId).trim() !== req.headers["userid"]) return res.status(401).send({status: false, message: "Please create a book for the loggedIn user as you are not authorized"})
+
+
     //As subcategory is array of string type hence deleted subcategory from bookData as .trim() doesn't works on it 
     let subcategory=bookData.subcategory
     let reviews=bookData.reviews
